@@ -75,14 +75,28 @@ function PalpiteRow({ match, teamMap, pred, onSave }: any) {
         <span>{formatKickoff(match.kickoff_at)} {locked && "🔒"}</span>
       </div>
       <div className="flex items-center gap-2">
-        <div className="flex-1 text-right text-sm font-semibold truncate">
-          {home ? <span className="inline-flex items-center gap-2">{home.name} <TeamFlag code={home.code} emoji={home.flag_emoji} size={24} /></span> : <span className="italic text-muted-foreground">{match.home_label ?? "TBD"}</span>}
+        <div className="flex-1 text-sm font-semibold min-w-0">
+          {home ? (
+            <span className="flex items-center justify-end gap-2">
+              <span className="truncate">{home.name}</span>
+              <TeamFlag code={home.code} emoji={home.flag_emoji} size={24} className="shrink-0" />
+            </span>
+          ) : (
+            <span className="italic text-muted-foreground truncate block text-right">{match.home_label ?? "TBD"}</span>
+          )}
         </div>
-        <Input type="number" min={0} max={20} value={h} onChange={(e) => setH(e.target.value)} disabled={locked || !home} className="w-14 text-center font-bold" />
-        <span className="text-muted-foreground">×</span>
-        <Input type="number" min={0} max={20} value={a} onChange={(e) => setA(e.target.value)} disabled={locked || !away} className="w-14 text-center font-bold" />
-        <div className="flex-1 text-sm font-semibold truncate">
-          {away ? <span className="inline-flex items-center gap-2"><TeamFlag code={away.code} emoji={away.flag_emoji} size={24} /> {away.name}</span> : <span className="italic text-muted-foreground">{match.away_label ?? "TBD"}</span>}
+        <Input type="number" min={0} max={20} value={h} onChange={(e) => setH(e.target.value)} disabled={locked || !home} className="w-14 text-center font-bold shrink-0" />
+        <span className="text-muted-foreground shrink-0">×</span>
+        <Input type="number" min={0} max={20} value={a} onChange={(e) => setA(e.target.value)} disabled={locked || !away} className="w-14 text-center font-bold shrink-0" />
+        <div className="flex-1 text-sm font-semibold min-w-0">
+          {away ? (
+            <span className="flex items-center justify-start gap-2">
+              <TeamFlag code={away.code} emoji={away.flag_emoji} size={24} className="shrink-0" />
+              <span className="truncate">{away.name}</span>
+            </span>
+          ) : (
+            <span className="italic text-muted-foreground truncate block text-left">{match.away_label ?? "TBD"}</span>
+          )}
         </div>
       </div>
       {canSave && (
