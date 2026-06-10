@@ -99,7 +99,7 @@ function AdminPage() {
             <Field key={k} label={l}>
               <Select value={bonus[k] ?? ""} onValueChange={(v) => setBonus({ ...bonus, [k]: v })}>
                 <SelectTrigger><SelectValue placeholder="—" /></SelectTrigger>
-                <SelectContent>{data.teams.map((t) => <SelectItem key={t.id} value={t.id}>{t.flag_emoji} {t.name}</SelectItem>)}</SelectContent>
+                <SelectContent>{data.teams.map((t) => <SelectItem key={t.id} value={t.id}><span className="inline-flex items-center gap-2"><TeamFlag code={t.code} emoji={t.flag_emoji} size={20} /> {t.name}</span></SelectItem>)}</SelectContent>
               </Select>
             </Field>
           ))}
@@ -125,14 +125,14 @@ function AdminMatchRow({ m, teams, onSave }: { m: Match; teams: Team[]; onSave: 
       <span className="text-xs text-muted-foreground w-12">#{m.match_number}</span>
       <Select value={s.home_team_id} onValueChange={(v) => setS({ ...s, home_team_id: v })}>
         <SelectTrigger className="w-44"><SelectValue placeholder={m.home_label ?? "Casa"} /></SelectTrigger>
-        <SelectContent>{teams.map((t) => <SelectItem key={t.id} value={t.id}>{t.flag_emoji} {t.name}</SelectItem>)}</SelectContent>
+        <SelectContent>{teams.map((t) => <SelectItem key={t.id} value={t.id}><span className="inline-flex items-center gap-2"><TeamFlag code={t.code} emoji={t.flag_emoji} size={20} /> {t.name}</span></SelectItem>)}</SelectContent>
       </Select>
       <Input className="w-14 text-center" type="number" value={s.home_score} onChange={(e) => setS({ ...s, home_score: e.target.value })} />
       <span>×</span>
       <Input className="w-14 text-center" type="number" value={s.away_score} onChange={(e) => setS({ ...s, away_score: e.target.value })} />
       <Select value={s.away_team_id} onValueChange={(v) => setS({ ...s, away_team_id: v })}>
         <SelectTrigger className="w-44"><SelectValue placeholder={m.away_label ?? "Visitante"} /></SelectTrigger>
-        <SelectContent>{teams.map((t) => <SelectItem key={t.id} value={t.id}>{t.flag_emoji} {t.name}</SelectItem>)}</SelectContent>
+        <SelectContent>{teams.map((t) => <SelectItem key={t.id} value={t.id}><span className="inline-flex items-center gap-2"><TeamFlag code={t.code} emoji={t.flag_emoji} size={20} /> {t.name}</span></SelectItem>)}</SelectContent>
       </Select>
       <Button size="sm" variant="secondary" onClick={() => onSave(s)}>Salvar</Button>
     </div>

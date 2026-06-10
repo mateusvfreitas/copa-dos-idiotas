@@ -75,13 +75,13 @@ function PalpiteRow({ match, teamMap, pred, onSave }: any) {
       </div>
       <div className="flex items-center gap-2">
         <div className="flex-1 text-right text-sm font-semibold truncate">
-          {home ? <>{home.name} {home.flag_emoji}</> : <span className="italic text-muted-foreground">{match.home_label ?? "TBD"}</span>}
+          {home ? <span className="inline-flex items-center gap-2">{home.name} <TeamFlag code={home.code} emoji={home.flag_emoji} size={24} /></span> : <span className="italic text-muted-foreground">{match.home_label ?? "TBD"}</span>}
         </div>
         <Input type="number" min={0} max={20} value={h} onChange={(e) => setH(e.target.value)} disabled={locked || !home} className="w-14 text-center font-bold" />
         <span className="text-muted-foreground">×</span>
         <Input type="number" min={0} max={20} value={a} onChange={(e) => setA(e.target.value)} disabled={locked || !away} className="w-14 text-center font-bold" />
         <div className="flex-1 text-sm font-semibold truncate">
-          {away ? <>{away.flag_emoji} {away.name}</> : <span className="italic text-muted-foreground">{match.away_label ?? "TBD"}</span>}
+          {away ? <span className="inline-flex items-center gap-2"><TeamFlag code={away.code} emoji={away.flag_emoji} size={24} /> {away.name}</span> : <span className="italic text-muted-foreground">{match.away_label ?? "TBD"}</span>}
         </div>
       </div>
       {canSave && (
