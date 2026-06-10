@@ -1,3 +1,4 @@
+import { TeamFlag } from "@/components/TeamFlag";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -49,13 +50,13 @@ function MatchCard({ match, teamMap }: { match: Match; teamMap: Record<string, T
       </div>
       <div className="flex items-center justify-between gap-2">
         <div className="flex-1 text-right font-semibold truncate">
-          {home ? <>{home.name} <span className="text-lg">{home.flag_emoji}</span></> : <span className="text-muted-foreground italic">{match.home_label ?? "TBD"}</span>}
+          {home ? <span className="inline-flex items-center gap-2">{home.name} <TeamFlag code={home.code} emoji={home.flag_emoji} size={28} /></span> : <span className="text-muted-foreground italic">{match.home_label ?? "TBD"}</span>}
         </div>
         <div className="px-3 py-1 rounded bg-accent text-accent-foreground font-black min-w-[60px] text-center">
           {hasResult ? `${match.home_score} × ${match.away_score}` : "vs"}
         </div>
         <div className="flex-1 font-semibold truncate">
-          {away ? <><span className="text-lg">{away.flag_emoji}</span> {away.name}</> : <span className="text-muted-foreground italic">{match.away_label ?? "TBD"}</span>}
+          {away ? <span className="inline-flex items-center gap-2"><TeamFlag code={away.code} emoji={away.flag_emoji} size={28} /> {away.name}</span> : <span className="text-muted-foreground italic">{match.away_label ?? "TBD"}</span>}
         </div>
       </div>
     </div>

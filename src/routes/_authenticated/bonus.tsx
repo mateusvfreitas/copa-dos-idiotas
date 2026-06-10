@@ -1,3 +1,4 @@
+import { TeamFlag } from "@/components/TeamFlag";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
@@ -75,7 +76,11 @@ function BonusPage() {
               <SelectTrigger><SelectValue placeholder="Escolha uma seleção" /></SelectTrigger>
               <SelectContent>
                 {data.teams.map((t) => (
-                  <SelectItem key={t.id} value={t.id}>{t.flag_emoji} {t.name}</SelectItem>
+                  <SelectItem key={t.id} value={t.id}>
+                    <span className="inline-flex items-center gap-2">
+                      <TeamFlag code={t.code} emoji={t.flag_emoji} size={20} /> {t.name}
+                    </span>
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
