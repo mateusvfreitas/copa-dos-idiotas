@@ -11,6 +11,8 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { Toaster } from "@/components/ui/sonner";
+import { Header } from "@/components/Header";
 
 function NotFoundComponent() {
   return (
@@ -118,8 +120,16 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-1">
+          <Outlet />
+        </main>
+        <footer className="border-t-2 border-secondary bg-accent text-accent-foreground py-4 text-center text-xs">
+          Bolão Copa do Mundo 2026 ⚽ Boa sorte galera!
+        </footer>
+      </div>
+      <Toaster richColors position="top-center" />
     </QueryClientProvider>
   );
 }
