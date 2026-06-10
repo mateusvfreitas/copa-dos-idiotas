@@ -11,6 +11,8 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { Toaster } from "@/components/ui/sonner";
+import { Header } from "@/components/Header";
 
 function NotFoundComponent() {
   return (
@@ -77,11 +79,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Bolão Copa do Mundo 2026" },
+      { name: "description", content: "Bolão entre amigos da Copa do Mundo FIFA 2026: palpite todos os jogos, artilheiro, campeão e mais." },
+      { property: "og:title", content: "Bolão Copa do Mundo 2026" },
+      { property: "og:description", content: "Bolão entre amigos da Copa do Mundo FIFA 2026: palpite todos os jogos, artilheiro, campeão e mais." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
@@ -118,8 +119,16 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-1">
+          <Outlet />
+        </main>
+        <footer className="border-t-2 border-secondary bg-accent text-accent-foreground py-4 text-center text-xs">
+          Bolão Copa do Mundo 2026 ⚽ Boa sorte galera!
+        </footer>
+      </div>
+      <Toaster richColors position="top-center" />
     </QueryClientProvider>
   );
 }
