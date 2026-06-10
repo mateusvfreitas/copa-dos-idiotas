@@ -86,6 +86,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "Bolão Copa do Mundo 2026" },
+      { name: "twitter:description", content: "Bolão entre amigos da Copa do Mundo FIFA 2026: palpite todos os jogos, artilheiro, campeão e mais." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/edb80222-ad4e-45b5-8cab-7e3a9e1b1895/id-preview-4905fed6--0ec2a4bb-f66e-43ea-be4d-3f3aafa612db.lovable.app-1781115935250.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/edb80222-ad4e-45b5-8cab-7e3a9e1b1895/id-preview-4905fed6--0ec2a4bb-f66e-43ea-be4d-3f3aafa612db.lovable.app-1781115935250.png" },
     ],
     links: [
       {
