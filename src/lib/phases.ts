@@ -1,14 +1,14 @@
 export const PHASE_LABELS: Record<string, string> = {
   group: "Fase de Grupos",
-  r32: "16-avos de Final",
-  r16: "Oitavas de Final",
-  qf: "Quartas de Final",
-  sf: "Semifinal",
+  round_of_32: "16-avos de Final",
+  round_of_16: "Oitavas de Final",
+  quarter_final: "Quartas de Final",
+  semi_final: "Semifinal",
   third_place: "Disputa de 3º lugar",
   final: "Final",
 };
 
-export const PHASE_ORDER = ["group", "r32", "r16", "qf", "sf", "third_place", "final"];
+export const PHASE_ORDER = ["group", "round_of_32", "round_of_16", "quarter_final", "semi_final", "third_place", "final"];
 
 export function formatKickoff(iso: string) {
   const d = new Date(iso);
