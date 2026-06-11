@@ -367,58 +367,20 @@ export type Database = {
       }
     }
     Views: {
-      rankings: {
-        Row: {
-          avatar_url: string | null
-          bonus_points: number | null
-          display_name: string | null
-          match_points: number | null
-          total_points: number | null
-          user_id: string | null
-        }
-        Insert: {
-          avatar_url?: string | null
-          bonus_points?: never
-          display_name?: string | null
-          match_points?: never
-          total_points?: never
-          user_id?: string | null
-        }
-        Update: {
-          avatar_url?: string | null
-          bonus_points?: never
-          display_name?: string | null
-          match_points?: never
-          total_points?: never
-          user_id?: string | null
-        }
-        Relationships: []
-      }
-      user_bonus_points: {
-        Row: {
-          bonus_points: number | null
-          user_id: string | null
-        }
-        Relationships: []
-      }
-      user_match_points: {
-        Row: {
-          match_id: string | null
-          points: number | null
-          user_id: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "predictions_match_id_fkey"
-            columns: ["match_id"]
-            isOneToOne: false
-            referencedRelation: "matches"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
+      [_ in never]: never
     }
     Functions: {
+      get_rankings: {
+        Args: never
+        Returns: {
+          avatar_url: string
+          bonus_points: number
+          display_name: string
+          match_points: number
+          total_points: number
+          user_id: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
