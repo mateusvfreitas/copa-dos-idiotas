@@ -18,12 +18,12 @@ export type Database = {
         Row: {
           best_attack_group_team_id: string | null
           best_defense_group_team_id: string | null
-          best_player: string | null
           champion_team_id: string | null
           fourth_team_id: string | null
           revelation_team_id: string | null
           runner_up_team_id: string | null
           third_team_id: string | null
+          top_assists: string | null
           top_scorer: string | null
           updated_at: string
           user_id: string
@@ -31,12 +31,12 @@ export type Database = {
         Insert: {
           best_attack_group_team_id?: string | null
           best_defense_group_team_id?: string | null
-          best_player?: string | null
           champion_team_id?: string | null
           fourth_team_id?: string | null
           revelation_team_id?: string | null
           runner_up_team_id?: string | null
           third_team_id?: string | null
+          top_assists?: string | null
           top_scorer?: string | null
           updated_at?: string
           user_id: string
@@ -44,12 +44,12 @@ export type Database = {
         Update: {
           best_attack_group_team_id?: string | null
           best_defense_group_team_id?: string | null
-          best_player?: string | null
           champion_team_id?: string | null
           fourth_team_id?: string | null
           revelation_team_id?: string | null
           runner_up_team_id?: string | null
           third_team_id?: string | null
+          top_assists?: string | null
           top_scorer?: string | null
           updated_at?: string
           user_id?: string
@@ -110,39 +110,39 @@ export type Database = {
         Row: {
           best_attack_group_team_id: string | null
           best_defense_group_team_id: string | null
-          best_player: string | null
           champion_team_id: string | null
           fourth_team_id: string | null
           id: number
           revelation_team_id: string | null
           runner_up_team_id: string | null
           third_team_id: string | null
+          top_assists: string | null
           top_scorer: string | null
           updated_at: string
         }
         Insert: {
           best_attack_group_team_id?: string | null
           best_defense_group_team_id?: string | null
-          best_player?: string | null
           champion_team_id?: string | null
           fourth_team_id?: string | null
           id?: number
           revelation_team_id?: string | null
           runner_up_team_id?: string | null
           third_team_id?: string | null
+          top_assists?: string | null
           top_scorer?: string | null
           updated_at?: string
         }
         Update: {
           best_attack_group_team_id?: string | null
           best_defense_group_team_id?: string | null
-          best_player?: string | null
           champion_team_id?: string | null
           fourth_team_id?: string | null
           id?: number
           revelation_team_id?: string | null
           runner_up_team_id?: string | null
           third_team_id?: string | null
+          top_assists?: string | null
           top_scorer?: string | null
           updated_at?: string
         }
@@ -367,58 +367,20 @@ export type Database = {
       }
     }
     Views: {
-      rankings: {
-        Row: {
-          avatar_url: string | null
-          bonus_points: number | null
-          display_name: string | null
-          match_points: number | null
-          total_points: number | null
-          user_id: string | null
-        }
-        Insert: {
-          avatar_url?: string | null
-          bonus_points?: never
-          display_name?: string | null
-          match_points?: never
-          total_points?: never
-          user_id?: string | null
-        }
-        Update: {
-          avatar_url?: string | null
-          bonus_points?: never
-          display_name?: string | null
-          match_points?: never
-          total_points?: never
-          user_id?: string | null
-        }
-        Relationships: []
-      }
-      user_bonus_points: {
-        Row: {
-          bonus_points: number | null
-          user_id: string | null
-        }
-        Relationships: []
-      }
-      user_match_points: {
-        Row: {
-          match_id: string | null
-          points: number | null
-          user_id: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "predictions_match_id_fkey"
-            columns: ["match_id"]
-            isOneToOne: false
-            referencedRelation: "matches"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
+      [_ in never]: never
     }
     Functions: {
+      get_rankings: {
+        Args: never
+        Returns: {
+          avatar_url: string
+          bonus_points: number
+          display_name: string
+          match_points: number
+          total_points: number
+          user_id: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
