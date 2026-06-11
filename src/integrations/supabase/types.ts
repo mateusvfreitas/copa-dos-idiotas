@@ -18,12 +18,12 @@ export type Database = {
         Row: {
           best_attack_group_team_id: string | null
           best_defense_group_team_id: string | null
-          best_player: string | null
           champion_team_id: string | null
           fourth_team_id: string | null
           revelation_team_id: string | null
           runner_up_team_id: string | null
           third_team_id: string | null
+          top_assists: string | null
           top_scorer: string | null
           updated_at: string
           user_id: string
@@ -31,12 +31,12 @@ export type Database = {
         Insert: {
           best_attack_group_team_id?: string | null
           best_defense_group_team_id?: string | null
-          best_player?: string | null
           champion_team_id?: string | null
           fourth_team_id?: string | null
           revelation_team_id?: string | null
           runner_up_team_id?: string | null
           third_team_id?: string | null
+          top_assists?: string | null
           top_scorer?: string | null
           updated_at?: string
           user_id: string
@@ -44,12 +44,12 @@ export type Database = {
         Update: {
           best_attack_group_team_id?: string | null
           best_defense_group_team_id?: string | null
-          best_player?: string | null
           champion_team_id?: string | null
           fourth_team_id?: string | null
           revelation_team_id?: string | null
           runner_up_team_id?: string | null
           third_team_id?: string | null
+          top_assists?: string | null
           top_scorer?: string | null
           updated_at?: string
           user_id?: string
@@ -110,39 +110,39 @@ export type Database = {
         Row: {
           best_attack_group_team_id: string | null
           best_defense_group_team_id: string | null
-          best_player: string | null
           champion_team_id: string | null
           fourth_team_id: string | null
           id: number
           revelation_team_id: string | null
           runner_up_team_id: string | null
           third_team_id: string | null
+          top_assists: string | null
           top_scorer: string | null
           updated_at: string
         }
         Insert: {
           best_attack_group_team_id?: string | null
           best_defense_group_team_id?: string | null
-          best_player?: string | null
           champion_team_id?: string | null
           fourth_team_id?: string | null
           id?: number
           revelation_team_id?: string | null
           runner_up_team_id?: string | null
           third_team_id?: string | null
+          top_assists?: string | null
           top_scorer?: string | null
           updated_at?: string
         }
         Update: {
           best_attack_group_team_id?: string | null
           best_defense_group_team_id?: string | null
-          best_player?: string | null
           champion_team_id?: string | null
           fourth_team_id?: string | null
           id?: number
           revelation_team_id?: string | null
           runner_up_team_id?: string | null
           third_team_id?: string | null
+          top_assists?: string | null
           top_scorer?: string | null
           updated_at?: string
         }
