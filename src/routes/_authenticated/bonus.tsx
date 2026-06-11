@@ -66,8 +66,8 @@ function BonusPage() {
           <Input value={form.top_scorer ?? ""} onChange={(e) => setF("top_scorer", e.target.value)} placeholder="Ex: Vinicius Junior" />
         </div>
         <div>
-          <Label>Melhor jogador do torneio (15 pts)</Label>
-          <Input value={form.best_player ?? ""} onChange={(e) => setF("best_player", e.target.value)} placeholder="Ex: Kylian Mbappé" />
+          <Label>Maior assistente do torneio — mais assistências (15 pts)</Label>
+          <Input value={form.top_assists ?? ""} onChange={(e) => setF("top_assists", e.target.value)} placeholder="Ex: Kevin De Bruyne" />
         </div>
         {TEAM_FIELDS.map(([k, label]) => (
           <div key={k}>

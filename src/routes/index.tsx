@@ -69,7 +69,7 @@ function Index() {
               ["Campeão", "25 pts"],
               ["Vice / 3º / 4º lugar", "15 / 10 / 5"],
               ["Seleção revelação", "15 pts"],
-              ["Melhor jogador", "15 pts"],
+              ["Maior assistente", "15 pts"],
               ["Melhor ataque / defesa (grupos)", "10 / 10"],
             ].map(([k, v]) => (
               <div key={k} className="flex items-center justify-between bg-accent-foreground/10 rounded-lg px-4 py-3 border border-accent-foreground/20">

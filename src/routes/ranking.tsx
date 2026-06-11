@@ -11,7 +11,7 @@ function RankingPage() {
   const { data, isLoading } = useQuery({
     queryKey: ["rankings"],
     queryFn: async () => {
-      const { data } = await supabase.from("rankings").select("*").order("total_points", { ascending: false });
+      const { data } = await supabase.rpc("get_rankings");
       return data ?? [];
     },
   });

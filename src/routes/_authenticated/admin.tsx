@@ -89,7 +89,7 @@ function AdminPage() {
         <summary className="cursor-pointer text-2xl font-bold text-primary py-2">Resultados dos bônus</summary>
         <div className="mt-4 space-y-4 bg-card border-2 border-border rounded-xl p-5">
           <Field label="Artilheiro"><Input value={bonus.top_scorer ?? ""} onChange={(e) => setBonus({ ...bonus, top_scorer: e.target.value })} /></Field>
-          <Field label="Melhor jogador"><Input value={bonus.best_player ?? ""} onChange={(e) => setBonus({ ...bonus, best_player: e.target.value })} /></Field>
+          <Field label="Maior assistente"><Input value={bonus.top_assists ?? ""} onChange={(e) => setBonus({ ...bonus, top_assists: e.target.value })} /></Field>
           {[
             ["champion_team_id", "Campeão"], ["runner_up_team_id", "Vice"],
             ["third_team_id", "3º"], ["fourth_team_id", "4º"],
