@@ -1,6 +1,6 @@
 import { TeamFlag } from "@/components/TeamFlag";
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { toast } from "sonner";
+import { AlertCircle } from "lucide-react";
 import type { Team } from "@/lib/phases";
 
 export const Route = createFileRoute("/_authenticated/bonus")({
