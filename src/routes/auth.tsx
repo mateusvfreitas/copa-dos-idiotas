@@ -1,10 +1,13 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { lovable } from "@/integrations/lovable";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Trophy } from "lucide-react";
 import { toast } from "sonner";
+
+function authCallbackUrl() {
+  return `${window.location.origin}/auth/callback`;
+}
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -28,16 +31,14 @@ function AuthPage() {
 
   const signIn = async () => {
     setLoading(true);
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin + "/palpites",
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: { redirectTo: authCallbackUrl() },
     });
-    if (result.error) {
-      toast.error("Falha ao entrar: " + (result.error.message ?? "tente novamente"));
+    if (error) {
+      toast.error("Falha ao entrar: " + (error.message ?? "tente novamente"));
       setLoading(false);
-      return;
     }
-    if (result.redirected) return;
-    navigate({ to: "/palpites" });
   };
 
   return (

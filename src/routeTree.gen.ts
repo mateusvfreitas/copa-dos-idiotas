@@ -14,6 +14,7 @@ import { Route as JogosRouteImport } from './routes/jogos'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthCallbackRouteImport } from './routes/auth/callback'
 import { Route as AuthenticatedPalpitesRouteImport } from './routes/_authenticated/palpites'
 import { Route as AuthenticatedBonusRouteImport } from './routes/_authenticated/bonus'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
@@ -42,6 +43,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/callback',
+  path: '/callback',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthenticatedPalpitesRoute = AuthenticatedPalpitesRouteImport.update({
   id: '/palpites',
   path: '/palpites',
@@ -60,32 +66,35 @@ const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/jogos': typeof JogosRoute
   '/ranking': typeof RankingRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/bonus': typeof AuthenticatedBonusRoute
   '/palpites': typeof AuthenticatedPalpitesRoute
+  '/auth/callback': typeof AuthCallbackRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/jogos': typeof JogosRoute
   '/ranking': typeof RankingRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/bonus': typeof AuthenticatedBonusRoute
   '/palpites': typeof AuthenticatedPalpitesRoute
+  '/auth/callback': typeof AuthCallbackRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
-  '/auth': typeof AuthRoute
+  '/auth': typeof AuthRouteWithChildren
   '/jogos': typeof JogosRoute
   '/ranking': typeof RankingRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/bonus': typeof AuthenticatedBonusRoute
   '/_authenticated/palpites': typeof AuthenticatedPalpitesRoute
+  '/auth/callback': typeof AuthCallbackRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -97,8 +106,17 @@ export interface FileRouteTypes {
     | '/admin'
     | '/bonus'
     | '/palpites'
+    | '/auth/callback'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/jogos' | '/ranking' | '/admin' | '/bonus' | '/palpites'
+  to:
+    | '/'
+    | '/auth'
+    | '/jogos'
+    | '/ranking'
+    | '/admin'
+    | '/bonus'
+    | '/palpites'
+    | '/auth/callback'
   id:
     | '__root__'
     | '/'
@@ -109,12 +127,13 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/bonus'
     | '/_authenticated/palpites'
+    | '/auth/callback'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
-  AuthRoute: typeof AuthRoute
+  AuthRoute: typeof AuthRouteWithChildren
   JogosRoute: typeof JogosRoute
   RankingRoute: typeof RankingRoute
 }
@@ -156,6 +175,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_authenticated/palpites': {
       id: '/_authenticated/palpites'
       path: '/palpites'
@@ -195,13 +221,33 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface AuthRouteChildren {
+  AuthCallbackRoute: typeof AuthCallbackRoute
+}
+
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthCallbackRoute: AuthCallbackRoute,
+}
+
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
-  AuthRoute: AuthRoute,
+  AuthRoute: AuthRouteWithChildren,
   JogosRoute: JogosRoute,
   RankingRoute: RankingRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
