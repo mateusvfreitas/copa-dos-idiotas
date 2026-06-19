@@ -130,11 +130,12 @@ function PalpitesTab({
     queryKey: ["started-match-predictions", selectedId],
     enabled: !!selectedId,
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("get_started_match_predictions", {
-        p_match_id: selectedId,
-      });
+      const { data, error } = await (supabase.rpc as any)(
+        "get_started_match_predictions",
+        { p_match_id: selectedId },
+      );
       if (error) throw error;
-      return (data ?? []) as StartedPrediction[];
+      return ((data ?? []) as unknown) as StartedPrediction[];
     },
   });
 
