@@ -376,8 +376,23 @@ export type Database = {
           avatar_url: string
           bonus_points: number
           display_name: string
+          exact_count: number
           match_points: number
+          miss_count: number
           total_points: number
+          user_id: string
+          winner_gd_count: number
+          winner_only_count: number
+        }[]
+      }
+      get_started_match_predictions: {
+        Args: { p_match_id: string }
+        Returns: {
+          avatar_url: string
+          away_score: number
+          display_name: string
+          home_score: number
+          points_earned: number
           user_id: string
         }[]
       }
