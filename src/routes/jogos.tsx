@@ -52,7 +52,7 @@ function JogosPage() {
   const lockedCount = data.matches.length - startedMatches.length;
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-5xl min-w-0">
+    <div className="container mx-auto min-w-0 overflow-x-hidden px-4 py-8 max-w-5xl">
       <h1 className="text-3xl sm:text-4xl font-black mb-6">Jogos</h1>
       <Tabs defaultValue="resultados">
         <TabsList className="mb-6 h-auto flex-wrap w-fit max-w-full">
@@ -154,31 +154,31 @@ function PalpitesTab({
   }
 
   return (
-    <div className="space-y-6 min-w-0 max-w-3xl">
+    <div className="min-w-0 space-y-6 overflow-hidden">
       {lockedCount > 0 && (
         <p className="text-sm text-muted-foreground">{lockedCount} jogos ainda bloqueados — palpites liberados só após o apito inicial.</p>
       )}
 
       <Select value={selectedId} onValueChange={setSelectedId}>
-        <SelectTrigger className="w-full">
+        <SelectTrigger className="h-auto min-w-0 w-full py-2.5 [&>span]:line-clamp-2 [&>span]:whitespace-normal">
           <SelectValue placeholder="Escolha um jogo" />
         </SelectTrigger>
-          <SelectContent>
-            {groupedStarted.map(({ phase, matches: phaseMatches }) => (
-              <SelectGroup key={phase}>
-                <SelectLabel>{PHASE_LABELS[phase]}</SelectLabel>
-                {phaseMatches.map((m) => (
-                  <SelectItem key={m.id} value={m.id}>
-                    {matchSelectLabel(m, teamMap)}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            ))}
-          </SelectContent>
-        </Select>
+        <SelectContent>
+          {groupedStarted.map(({ phase, matches: phaseMatches }) => (
+            <SelectGroup key={phase}>
+              <SelectLabel>{PHASE_LABELS[phase]}</SelectLabel>
+              {phaseMatches.map((m) => (
+                <SelectItem key={m.id} value={m.id}>
+                  {matchSelectLabel(m, teamMap)}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          ))}
+        </SelectContent>
+      </Select>
 
       {selectedMatch && (
-        <div className="rounded-xl border-2 border-border bg-card p-3 sm:p-4 shadow-sm overflow-hidden">
+        <div className="overflow-hidden rounded-xl border-2 border-border bg-card p-3 shadow-sm sm:p-4">
           <MatchCard match={selectedMatch} teamMap={teamMap} compact />
         </div>
       )}
@@ -186,47 +186,83 @@ function PalpitesTab({
       {isLoading ? (
         <div className="py-8 text-center text-muted-foreground">Carregando palpites…</div>
       ) : (
-        <div className="rounded-xl border-2 border-border bg-card overflow-hidden shadow overflow-x-auto">
-          <table className="w-full min-w-[320px]">
-            <thead className="bg-primary text-primary-foreground text-sm">
-              <tr className="text-left">
-                <th className="p-3">Participante</th>
-                <th className="p-3 text-center">Palpite</th>
-                <th className="p-3 text-right">Pts</th>
-              </tr>
-            </thead>
-            <tbody>
-              {(predictions ?? []).map((p) => (
-                <tr key={p.user_id} className="border-t border-border">
-                  <td className="p-3">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <Avatar className="h-8 w-8 shrink-0">
-                        <AvatarImage src={p.avatar_url ?? undefined} alt={p.display_name} />
-                        <AvatarFallback className="text-xs">{initials(p.display_name)}</AvatarFallback>
-                      </Avatar>
-                      <span className="truncate font-medium">{p.display_name}</span>
-                    </div>
-                  </td>
-                  <td className="p-3 text-center font-black tabular-nums">
-                    {p.home_score} × {p.away_score}
-                  </td>
-                  <td className={cn("p-3 text-right font-bold tabular-nums", p.points_earned > 0 && "text-primary")}>
-                    {p.points_earned}
-                  </td>
-                </tr>
-              ))}
-              {(!predictions || predictions.length === 0) && (
-                <tr>
-                  <td colSpan={3} className="p-6 text-center text-muted-foreground">
-                    Ninguém palpitou neste jogo.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+        <PredictionsList predictions={predictions ?? []} />
       )}
     </div>
+  );
+}
+
+function PredictionsList({ predictions }: { predictions: StartedPrediction[] }) {
+  if (predictions.length === 0) {
+    return (
+      <div className="rounded-xl border-2 border-border bg-card p-6 text-center text-muted-foreground shadow">
+        Ninguém palpitou neste jogo.
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <div className="overflow-hidden rounded-xl border-2 border-border bg-card shadow sm:hidden">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto_auto] gap-2 border-b border-border bg-primary px-3 py-2 text-xs font-medium text-primary-foreground">
+          <span>Participante</span>
+          <span className="text-center">Palpite</span>
+          <span className="w-8 text-right">Pts</span>
+        </div>
+        <div className="divide-y divide-border">
+          {predictions.map((p) => (
+            <div key={p.user_id} className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 px-3 py-2.5">
+              <div className="flex min-w-0 items-center gap-2">
+                <Avatar className="h-8 w-8 shrink-0">
+                  <AvatarImage src={p.avatar_url ?? undefined} alt={p.display_name} />
+                  <AvatarFallback className="text-xs">{initials(p.display_name)}</AvatarFallback>
+                </Avatar>
+                <span className="truncate text-sm font-medium">{p.display_name}</span>
+              </div>
+              <span className="shrink-0 text-sm font-black tabular-nums">
+                {p.home_score} × {p.away_score}
+              </span>
+              <span className={cn("w-8 shrink-0 text-right text-sm font-bold tabular-nums", p.points_earned > 0 && "text-primary")}>
+                {p.points_earned}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="hidden overflow-hidden rounded-xl border-2 border-border bg-card shadow sm:block">
+        <table className="w-full table-fixed">
+          <thead className="bg-primary text-primary-foreground text-sm">
+            <tr className="text-left">
+              <th className="p-3">Participante</th>
+              <th className="w-28 p-3 text-center">Palpite</th>
+              <th className="w-16 p-3 text-right">Pts</th>
+            </tr>
+          </thead>
+          <tbody>
+            {predictions.map((p) => (
+              <tr key={p.user_id} className="border-t border-border">
+                <td className="max-w-0 p-3">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <Avatar className="h-8 w-8 shrink-0">
+                      <AvatarImage src={p.avatar_url ?? undefined} alt={p.display_name} />
+                      <AvatarFallback className="text-xs">{initials(p.display_name)}</AvatarFallback>
+                    </Avatar>
+                    <span className="truncate font-medium">{p.display_name}</span>
+                  </div>
+                </td>
+                <td className="p-3 text-center font-black tabular-nums">
+                  {p.home_score} × {p.away_score}
+                </td>
+                <td className={cn("p-3 text-right font-bold tabular-nums", p.points_earned > 0 && "text-primary")}>
+                  {p.points_earned}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 }
 
