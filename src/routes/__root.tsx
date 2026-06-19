@@ -110,7 +110,7 @@ function RootShell({ children }: { children: ReactNode }) {
       <head>
         <HeadContent />
       </head>
-      <body>
+      <body className="overflow-x-hidden">
         {children}
         <Scripts />
       </body>
@@ -123,9 +123,9 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col overflow-x-hidden">
         <Header />
-        <main className="flex-1">
+        <main className="flex-1 min-w-0">
           <Outlet />
         </main>
         <footer className="border-t-2 border-secondary bg-accent text-accent-foreground py-4 text-center text-xs">

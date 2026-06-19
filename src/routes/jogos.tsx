@@ -52,19 +52,19 @@ function JogosPage() {
   const lockedCount = data.matches.length - startedMatches.length;
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-black mb-6">Jogos</h1>
+    <div className="container mx-auto px-4 py-8 max-w-5xl min-w-0">
+      <h1 className="text-3xl sm:text-4xl font-black mb-6">Jogos</h1>
       <Tabs defaultValue="resultados">
-        <TabsList className="mb-6 h-auto flex-wrap">
-          <TabsTrigger value="resultados">Resultados</TabsTrigger>
-          <TabsTrigger value="palpites">Palpites dos idiotas</TabsTrigger>
+        <TabsList className="mb-6 h-auto flex-wrap w-fit max-w-full">
+          <TabsTrigger value="resultados" className="flex-1 sm:flex-none">Resultados</TabsTrigger>
+          <TabsTrigger value="palpites" className="flex-1 sm:flex-none">Palpites dos idiotas</TabsTrigger>
         </TabsList>
 
         <TabsContent value="resultados">
           <ResultadosTab matches={data.matches} teamMap={teamMap} />
         </TabsContent>
 
-        <TabsContent value="palpites">
+        <TabsContent value="palpites" className="min-w-0 overflow-x-hidden">
           {authLoading ? (
             <div className="py-12 text-center text-muted-foreground">Carregando…</div>
           ) : !user ? (
@@ -154,16 +154,15 @@ function PalpitesTab({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 min-w-0 max-w-3xl">
       {lockedCount > 0 && (
         <p className="text-sm text-muted-foreground">{lockedCount} jogos ainda bloqueados — palpites liberados só após o apito inicial.</p>
       )}
 
-      <div className="max-w-xl">
-        <Select value={selectedId} onValueChange={setSelectedId}>
-          <SelectTrigger>
-            <SelectValue placeholder="Escolha um jogo" />
-          </SelectTrigger>
+      <Select value={selectedId} onValueChange={setSelectedId}>
+        <SelectTrigger className="w-full">
+          <SelectValue placeholder="Escolha um jogo" />
+        </SelectTrigger>
           <SelectContent>
             {groupedStarted.map(({ phase, matches: phaseMatches }) => (
               <SelectGroup key={phase}>
@@ -177,19 +176,18 @@ function PalpitesTab({
             ))}
           </SelectContent>
         </Select>
-      </div>
 
       {selectedMatch && (
-        <div className="rounded-xl border-2 border-border bg-card p-4 shadow-sm">
-          <MatchCard match={selectedMatch} teamMap={teamMap} />
+        <div className="rounded-xl border-2 border-border bg-card p-3 sm:p-4 shadow-sm overflow-hidden">
+          <MatchCard match={selectedMatch} teamMap={teamMap} compact />
         </div>
       )}
 
       {isLoading ? (
         <div className="py-8 text-center text-muted-foreground">Carregando palpites…</div>
       ) : (
-        <div className="rounded-xl border-2 border-border bg-card overflow-hidden shadow">
-          <table className="w-full">
+        <div className="rounded-xl border-2 border-border bg-card overflow-hidden shadow overflow-x-auto">
+          <table className="w-full min-w-[320px]">
             <thead className="bg-primary text-primary-foreground text-sm">
               <tr className="text-left">
                 <th className="p-3">Participante</th>
@@ -240,41 +238,50 @@ function matchSelectLabel(match: Match, teamMap: Record<string, Team>) {
   return `#${match.match_number} · ${home} vs ${away}${score}`;
 }
 
-function MatchCard({ match, teamMap }: { match: Match; teamMap: Record<string, Team> }) {
+function MatchCard({
+  match,
+  teamMap,
+  compact = false,
+}: {
+  match: Match;
+  teamMap: Record<string, Team>;
+  compact?: boolean;
+}) {
   const home = match.home_team_id ? teamMap[match.home_team_id] : null;
   const away = match.away_team_id ? teamMap[match.away_team_id] : null;
   const hasResult = match.home_score !== null && match.away_score !== null;
+  const flagSize = compact ? 22 : 28;
   return (
-    <div className="rounded-lg border-2 border-border bg-card p-3 hover:border-primary transition">
-      <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
-        <span>
+    <div className="rounded-lg border-2 border-border bg-card p-3 hover:border-primary transition overflow-hidden">
+      <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground mb-2 min-w-0">
+        <span className="truncate">
           #{match.match_number}
           {match.group_letter ? ` · Grupo ${match.group_letter}` : ""}
         </span>
-        <span>{formatKickoff(match.kickoff_at)}</span>
+        <span className="shrink-0 text-[10px] sm:text-xs">{formatKickoff(match.kickoff_at)}</span>
       </div>
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex-1 font-semibold min-w-0">
+      <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-1 sm:gap-2">
+        <div className="font-semibold min-w-0">
           {home ? (
-            <span className="flex items-center justify-end gap-2">
-              <span className="truncate">{home.name}</span>
-              <TeamFlag code={home.code} emoji={home.flag_emoji} size={28} className="shrink-0" />
+            <span className="flex items-center justify-end gap-1 sm:gap-2 min-w-0">
+              <span className="truncate text-xs sm:text-sm">{home.name}</span>
+              <TeamFlag code={home.code} emoji={home.flag_emoji} size={flagSize} className="shrink-0" />
             </span>
           ) : (
-            <span className="text-muted-foreground italic truncate block text-right">{match.home_label ?? "TBD"}</span>
+            <span className="text-muted-foreground italic truncate block text-right text-xs sm:text-sm">{match.home_label ?? "TBD"}</span>
           )}
         </div>
-        <div className="px-3 py-1 rounded bg-accent text-accent-foreground font-black min-w-[60px] text-center shrink-0">
+        <div className="px-2 sm:px-3 py-1 rounded bg-accent text-accent-foreground font-black text-sm sm:text-base text-center shrink-0 tabular-nums">
           {hasResult ? `${match.home_score} × ${match.away_score}` : "vs"}
         </div>
-        <div className="flex-1 font-semibold min-w-0">
+        <div className="font-semibold min-w-0">
           {away ? (
-            <span className="flex items-center justify-start gap-2">
-              <TeamFlag code={away.code} emoji={away.flag_emoji} size={28} className="shrink-0" />
-              <span className="truncate">{away.name}</span>
+            <span className="flex items-center justify-start gap-1 sm:gap-2 min-w-0">
+              <TeamFlag code={away.code} emoji={away.flag_emoji} size={flagSize} className="shrink-0" />
+              <span className="truncate text-xs sm:text-sm">{away.name}</span>
             </span>
           ) : (
-            <span className="text-muted-foreground italic truncate block text-left">{match.away_label ?? "TBD"}</span>
+            <span className="text-muted-foreground italic truncate block text-left text-xs sm:text-sm">{match.away_label ?? "TBD"}</span>
           )}
         </div>
       </div>

@@ -42,13 +42,13 @@ function PalpitesPage() {
   const predMap = Object.fromEntries(data.preds.map((p: any) => [p.match_id, p]));
   const grouped = PHASE_ORDER.map((p) => ({ phase: p, matches: data.matches.filter((m) => m.phase === p) }));
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-black mb-2">Meus palpites</h1>
+    <div className="container mx-auto px-4 py-8 max-w-4xl min-w-0 overflow-x-hidden">
+      <h1 className="text-3xl sm:text-4xl font-black mb-2">Meus palpites</h1>
       <p className="text-muted-foreground mb-6 text-sm">Preencha o placar de cada jogo. Você pode editar até o início da partida.</p>
       {grouped.map(({ phase, matches }) => matches.length > 0 && (
-        <section key={phase} className="mb-10">
-          <h2 className="text-2xl font-bold mb-3 text-primary border-b-2 border-secondary pb-1">{PHASE_LABELS[phase]}</h2>
-          <div className="grid md:grid-cols-2 gap-3">
+        <section key={phase} className="mb-10 min-w-0">
+          <h2 className="text-xl sm:text-2xl font-bold mb-3 text-primary border-b-2 border-secondary pb-1">{PHASE_LABELS[phase]}</h2>
+          <div className="grid md:grid-cols-2 gap-3 min-w-0">
             {matches.map((m) => <PalpiteRow key={m.id} match={m} teamMap={teamMap} pred={predMap[m.id]} onSave={save.mutate} />)}
           </div>
         </section>
@@ -67,41 +67,100 @@ function PalpiteRow({ match, teamMap, pred, onSave }: any) {
   const home = match.home_team_id ? teamMap[match.home_team_id] : null;
   const away = match.away_team_id ? teamMap[match.away_team_id] : null;
   const locked = new Date(match.kickoff_at) <= new Date();
-  const canSave = !locked && h !== "" && a !== "" && (h !== (pred?.home_score?.toString() ?? "") || a !== (pred?.away_score?.toString() ?? ""));
+  const canSave =
+    !locked &&
+    h !== "" &&
+    a !== "" &&
+    (h !== (pred?.home_score?.toString() ?? "") || a !== (pred?.away_score?.toString() ?? ""));
+
   return (
-    <div className="rounded-lg border-2 border-border bg-card p-3">
-      <div className="text-xs text-muted-foreground mb-2 flex justify-between">
-        <span>#{match.match_number}{match.group_letter ? ` · Grupo ${match.group_letter}` : ""}</span>
-        <span>{formatKickoff(match.kickoff_at)} {locked && "🔒"}</span>
+    <div className="rounded-xl border-2 border-border bg-card p-3 sm:p-4 overflow-hidden min-w-0">
+      <div className="text-xs text-muted-foreground mb-3 flex justify-between gap-2">
+        <span className="truncate font-medium">
+          #{match.match_number}
+          {match.group_letter ? ` · Grupo ${match.group_letter}` : ""}
+        </span>
+        <span className="shrink-0 tabular-nums">
+          {formatKickoff(match.kickoff_at)}
+          {locked && " 🔒"}
+        </span>
       </div>
-      <div className="flex items-center gap-2">
-        <div className="flex-1 text-sm font-semibold min-w-0">
-          {home ? (
-            <span className="flex items-center justify-end gap-2">
-              <span className="truncate">{home.name}</span>
-              <TeamFlag code={home.code} emoji={home.flag_emoji} size={24} className="shrink-0" />
-            </span>
-          ) : (
-            <span className="italic text-muted-foreground truncate block text-right">{match.home_label ?? "TBD"}</span>
-          )}
-        </div>
-        <Input type="number" min={0} max={20} value={h} onChange={(e) => setH(e.target.value)} disabled={locked || !home} className="w-14 text-center font-bold shrink-0" />
-        <span className="text-muted-foreground shrink-0">×</span>
-        <Input type="number" min={0} max={20} value={a} onChange={(e) => setA(e.target.value)} disabled={locked || !away} className="w-14 text-center font-bold shrink-0" />
-        <div className="flex-1 text-sm font-semibold min-w-0">
-          {away ? (
-            <span className="flex items-center justify-start gap-2">
-              <TeamFlag code={away.code} emoji={away.flag_emoji} size={24} className="shrink-0" />
-              <span className="truncate">{away.name}</span>
-            </span>
-          ) : (
-            <span className="italic text-muted-foreground truncate block text-left">{match.away_label ?? "TBD"}</span>
-          )}
-        </div>
+
+      <div className="divide-y divide-border/60">
+        <TeamScoreRow
+          team={home}
+          fallback={match.home_label}
+          value={h}
+          onChange={setH}
+          disabled={locked || !home}
+          ariaLabel="Gols mandante"
+        />
+        <TeamScoreRow
+          team={away}
+          fallback={match.away_label}
+          value={a}
+          onChange={setA}
+          disabled={locked || !away}
+          ariaLabel="Gols visitante"
+        />
       </div>
+
       {canSave && (
-        <Button size="sm" className="mt-2 w-full" onClick={() => onSave({ match_id: match.id, home_score: Number(h), away_score: Number(a) })}>Salvar palpite</Button>
+        <Button
+          size="sm"
+          className="mt-3 w-full font-bold"
+          onClick={() => onSave({ match_id: match.id, home_score: Number(h), away_score: Number(a) })}
+        >
+          Salvar palpite
+        </Button>
       )}
+    </div>
+  );
+}
+
+function TeamScoreRow({
+  team,
+  fallback,
+  value,
+  onChange,
+  disabled,
+  ariaLabel,
+}: {
+  team: Team | null;
+  fallback?: string | null;
+  value: string;
+  onChange: (v: string) => void;
+  disabled: boolean;
+  ariaLabel: string;
+}) {
+  return (
+    <div className="flex items-center gap-2 py-2 first:pt-0 last:pb-0 min-w-0">
+      <div className="flex items-center gap-2 min-w-0 flex-1">
+        {team ? (
+          <>
+            <TeamFlag code={team.code} emoji={team.flag_emoji} size={22} className="shrink-0" />
+            <span className="truncate font-semibold text-sm leading-tight">{team.name}</span>
+          </>
+        ) : (
+          <>
+            <span className="inline-flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full bg-muted text-[10px] text-muted-foreground">
+              ?
+            </span>
+            <span className="truncate text-sm italic text-muted-foreground">{fallback ?? "TBD"}</span>
+          </>
+        )}
+      </div>
+      <Input
+        type="number"
+        min={0}
+        max={20}
+        inputMode="numeric"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        disabled={disabled}
+        aria-label={ariaLabel}
+        className="h-9 w-11 shrink-0 px-0 py-0 text-center text-base font-black tabular-nums leading-9 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none sm:h-10 sm:w-12 sm:text-lg sm:leading-10 md:text-lg"
+      />
     </div>
   );
 }

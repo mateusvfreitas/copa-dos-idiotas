@@ -55,11 +55,11 @@ function RankingPage() {
   const rows = data ?? [];
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-3xl">
-      <h1 className="text-4xl font-black mb-2">Ranking</h1>
+    <div className="container mx-auto px-4 py-8 max-w-3xl min-w-0">
+      <h1 className="text-3xl sm:text-4xl font-black mb-2">Ranking</h1>
       <p className="text-sm text-muted-foreground mb-6">Toque em um participante para ver o detalhe dos palpites.</p>
-      <div className="rounded-xl border-2 border-border bg-card overflow-hidden shadow">
-        <table className="w-full">
+      <div className="rounded-xl border-2 border-border bg-card overflow-hidden shadow overflow-x-auto">
+        <table className="w-full min-w-[280px]">
           <thead className="bg-primary text-primary-foreground">
             <tr className="text-left text-sm">
               <th className="p-3 w-12">#</th>
@@ -126,7 +126,7 @@ function RankingPage() {
                           {MATCH_BREAKDOWN.map(({ key, label, pts }) => (
                             <div key={key} className="rounded-lg border border-border bg-card px-3 py-2">
                               <div className="text-muted-foreground text-xs">{label}</div>
-                              <div className="font-black text-lg">{r[key]}</div>
+                              <div className="font-black text-lg">{Number(r[key] ?? 0)}</div>
                               {pts > 0 && <div className="text-xs text-muted-foreground">{pts} pts cada</div>}
                             </div>
                           ))}

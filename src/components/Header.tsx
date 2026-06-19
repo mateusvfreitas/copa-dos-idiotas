@@ -6,14 +6,14 @@ import { Trophy, LogOut } from "lucide-react";
 
 export function Header() {
   const { user } = useAuth();
-  const isAdmin = useIsAdmin(user?.id);
+  const { isAdmin } = useIsAdmin(user?.id);
 
   return (
     <header className="border-b-4 border-secondary bg-primary text-primary-foreground shadow-lg">
-      <div className="container mx-auto flex items-center justify-between px-4 py-3">
-        <Link to="/" className="flex items-center gap-2 font-extrabold text-xl tracking-tight">
-          <Trophy className="h-6 w-6 text-secondary" />
-          <span>Bolão Copa 2026</span>
+      <div className="container mx-auto flex items-center justify-between gap-2 px-4 py-3 min-w-0">
+        <Link to="/" className="flex items-center gap-2 font-extrabold text-lg sm:text-xl tracking-tight min-w-0 shrink">
+          <Trophy className="h-6 w-6 text-secondary shrink-0" />
+          <span className="truncate">Bolão Copa 2026</span>
         </Link>
         <nav className="hidden md:flex items-center gap-1 text-sm font-medium">
           <Link to="/jogos" className="px-3 py-2 rounded hover:bg-primary-foreground/10" activeProps={{ className: "bg-primary-foreground/15 px-3 py-2 rounded" }}>Jogos</Link>
@@ -28,7 +28,7 @@ export function Header() {
             </>
           )}
         </nav>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           {user ? (
             <Button
               variant="secondary"
