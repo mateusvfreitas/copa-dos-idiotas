@@ -6,7 +6,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
-import { MATCH_BREAKDOWN, MEDAL_EMOJI, MEDAL_ROW_CLASS, initials } from "@/lib/scoring";
+import {
+  MATCH_BREAKDOWN,
+  RANKING_ROW_CLASS,
+  RANKING_TITLES,
+  getRankingTitle,
+  initials,
+  rankingTitleClass,
+} from "@/lib/scoring";
 
 export const Route = createFileRoute("/ranking")({
   head: () => ({
@@ -67,32 +74,42 @@ function RankingPage() {
             {rows.map((r, i) => {
               const isMe = user?.id === r.user_id;
               const isOpen = expanded === r.user_id;
-              const medalClass = i < 3 ? MEDAL_ROW_CLASS[i] : "";
+              const title = getRankingTitle(i);
+              const rowClass = i < RANKING_TITLES.length ? RANKING_ROW_CLASS[i] : "";
               return (
                 <Fragment key={r.user_id}>
                   <tr
                     className={cn(
                       "border-t border-border cursor-pointer hover:bg-muted/40 transition-colors",
-                      medalClass,
+                      rowClass,
                       isMe && "ring-2 ring-inset ring-primary/50 bg-primary/5",
                       i === 0 && !isMe && "font-bold",
                     )}
                     onClick={() => setExpanded(isOpen ? null : r.user_id)}
                   >
-                    <td className="p-3">
-                      {i + 1}
-                      {i < 3 ? ` ${MEDAL_EMOJI[i]}` : ""}
-                    </td>
+                    <td className="p-3 tabular-nums">{i + 1}</td>
                     <td className="p-3">
                       <div className="flex items-center gap-3 min-w-0">
                         <Avatar className="h-9 w-9 shrink-0">
                           <AvatarImage src={r.avatar_url ?? undefined} alt={r.display_name} />
                           <AvatarFallback className="text-xs font-bold">{initials(r.display_name)}</AvatarFallback>
                         </Avatar>
-                        <span className="truncate font-medium">
-                          {r.display_name}
-                          {isMe && <span className="text-xs text-muted-foreground ml-1">(você)</span>}
-                        </span>
+                        <div className="min-w-0">
+                          <span className="truncate font-medium block">
+                            {r.display_name}
+                            {isMe && <span className="text-xs text-muted-foreground ml-1">(você)</span>}
+                          </span>
+                          {title && (
+                            <span
+                              className={cn(
+                                "inline-block mt-1 text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full border",
+                                rankingTitleClass(title),
+                              )}
+                            >
+                              {title}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </td>
                     <td className="p-3 text-right hidden sm:table-cell">{r.match_points}</td>
