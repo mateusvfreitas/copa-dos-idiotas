@@ -1,4 +1,5 @@
 import { TeamFlag } from "@/components/TeamFlag";
+import { MatchDaySections } from "@/components/MatchDaySections";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState, useEffect } from "react";
@@ -48,9 +49,13 @@ function PalpitesPage() {
       {grouped.map(({ phase, matches }) => matches.length > 0 && (
         <section key={phase} className="mb-10 min-w-0">
           <h2 className="text-xl sm:text-2xl font-bold mb-3 text-primary border-b-2 border-secondary pb-1">{PHASE_LABELS[phase]}</h2>
-          <div className="grid md:grid-cols-2 gap-3 min-w-0">
-            {matches.map((m) => <PalpiteRow key={m.id} match={m} teamMap={teamMap} pred={predMap[m.id]} onSave={save.mutate} />)}
-          </div>
+          <MatchDaySections
+            matches={matches}
+            layout="grid"
+            renderMatch={(m) => (
+              <PalpiteRow key={m.id} match={m} teamMap={teamMap} pred={predMap[m.id]} onSave={save.mutate} />
+            )}
+          />
         </section>
       ))}
     </div>

@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { memo, useEffect, useMemo, useState, useTransition, type ReactNode } from "react";
+import { memo, useEffect, useMemo, useState, type ReactNode } from "react";
+import { MatchDaySections } from "@/components/MatchDaySections";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, useIsAdmin } from "@/hooks/useAuth";
 import { TeamFlag } from "@/components/TeamFlag";
@@ -181,22 +182,6 @@ function PhaseSection({
   defaultOpen?: boolean;
 }) {
   const [open, setOpen] = useState(defaultOpen);
-  const [visibleCount, setVisibleCount] = useState(defaultOpen ? matches.length : 0);
-  const [, startTransition] = useTransition();
-
-  useEffect(() => {
-    if (!open) {
-      setVisibleCount(0);
-      return;
-    }
-
-    setVisibleCount(Math.min(6, matches.length));
-    if (matches.length <= 6) return;
-
-    startTransition(() => {
-      setVisibleCount(matches.length);
-    });
-  }, [open, matches.length, phase]);
 
   return (
     <details
@@ -209,13 +194,12 @@ function PhaseSection({
         <span className="ml-2 text-sm font-normal text-muted-foreground">({matches.length})</span>
       </summary>
       {open && (
-        <div className="space-y-2 px-4 pb-4 min-w-0 overflow-x-hidden">
-          {matches.slice(0, visibleCount).map((m) => (
-            <AdminMatchRow key={m.id} m={m} teams={teams} onSave={onSave} />
-          ))}
-          {visibleCount < matches.length && (
-            <p className="py-2 text-center text-xs text-muted-foreground">Carregando jogos…</p>
-          )}
+        <div className="px-4 pb-4 min-w-0 overflow-x-hidden">
+          <MatchDaySections
+            matches={matches}
+            layout="stack"
+            renderMatch={(m) => <AdminMatchRow key={m.id} m={m} teams={teams} onSave={onSave} />}
+          />
         </div>
       )}
     </details>
