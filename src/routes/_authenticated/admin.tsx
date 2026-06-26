@@ -16,10 +16,44 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { PHASE_LABELS, PHASE_ORDER, type Match, type Team } from "@/lib/phases";
+import { initials } from "@/lib/scoring";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Check, ChevronDown } from "lucide-react";
+
+type BonusPrediction = {
+  user_id: string;
+  top_scorer: string | null;
+  top_assists: string | null;
+  champion_team_id: string | null;
+  runner_up_team_id: string | null;
+  third_team_id: string | null;
+  fourth_team_id: string | null;
+  revelation_team_id: string | null;
+  best_attack_group_team_id: string | null;
+  best_defense_group_team_id: string | null;
+};
+
+type BonusPredictionRow = {
+  user_id: string;
+  display_name: string;
+  avatar_url: string | null;
+  prediction: BonusPrediction | null;
+};
+
+const BONUS_PREDICTION_COLUMNS: { key: keyof BonusPrediction; label: string; type: "text" | "team" }[] = [
+  { key: "top_scorer", label: "Artilheiro", type: "text" },
+  { key: "top_assists", label: "Assist.", type: "text" },
+  { key: "champion_team_id", label: "Campeão", type: "team" },
+  { key: "runner_up_team_id", label: "Vice", type: "team" },
+  { key: "third_team_id", label: "3º", type: "team" },
+  { key: "fourth_team_id", label: "4º", type: "team" },
+  { key: "revelation_team_id", label: "Revelação", type: "team" },
+  { key: "best_attack_group_team_id", label: "Ataque", type: "team" },
+  { key: "best_defense_group_team_id", label: "Defesa", type: "team" },
+];
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({ meta: [{ title: "Admin — Bolão Copa 2026" }] }),
@@ -37,12 +71,38 @@ function AdminPage() {
   const { data, isLoading } = useQuery({
     queryKey: ["admin"],
     queryFn: async () => {
-      const [m, t, br] = await Promise.all([
+      const [m, t, br, bp] = await Promise.all([
         supabase.from("matches").select("*").order("match_number"),
         supabase.from("teams").select("*").order("name"),
         supabase.from("bonus_results").select("*").eq("id", 1).maybeSingle(),
+        supabase.rpc("get_admin_bonus_predictions"),
       ]);
-      return { matches: (m.data ?? []) as Match[], teams: (t.data ?? []) as Team[], bonusResults: br.data };
+      if (bp.error) throw bp.error;
+      const bonusPredictionRows: BonusPredictionRow[] = (bp.data ?? []).map((row) => ({
+        user_id: row.user_id,
+        display_name: row.display_name,
+        avatar_url: row.avatar_url,
+        prediction: row.has_prediction
+          ? {
+              user_id: row.user_id,
+              top_scorer: row.top_scorer,
+              top_assists: row.top_assists,
+              champion_team_id: row.champion_team_id,
+              runner_up_team_id: row.runner_up_team_id,
+              third_team_id: row.third_team_id,
+              fourth_team_id: row.fourth_team_id,
+              revelation_team_id: row.revelation_team_id,
+              best_attack_group_team_id: row.best_attack_group_team_id,
+              best_defense_group_team_id: row.best_defense_group_team_id,
+            }
+          : null,
+      }));
+      return {
+        matches: (m.data ?? []) as Match[],
+        teams: (t.data ?? []) as Team[],
+        bonusResults: br.data,
+        bonusPredictionRows,
+      };
     },
   });
 
@@ -115,6 +175,10 @@ function AdminPage() {
         )}
       </section>
 
+      <LazyDetails summary="Palpites bônus dos participantes" className="mb-8">
+        <BonusPredictionsTable rows={data.bonusPredictionRows} teams={data.teams} />
+      </LazyDetails>
+
       <LazyDetails summary="Resultados dos bônus" className="mb-8">
         <div className="mt-4 space-y-4 bg-card border-2 border-border rounded-xl p-5">
           <Field label="Artilheiro"><Input value={bonus.top_scorer ?? ""} onChange={(e) => setBonus({ ...bonus, top_scorer: e.target.value })} /></Field>
@@ -140,6 +204,147 @@ function AdminPage() {
         </div>
       </LazyDetails>
     </div>
+  );
+}
+
+function BonusPredictionsTable({ rows, teams }: { rows: BonusPredictionRow[]; teams: Team[] }) {
+  const teamMap = useMemo(() => new Map(teams.map((t) => [t.id, t])), [teams]);
+  const submitted = rows.filter((r) => r.prediction !== null).length;
+
+  if (rows.length === 0) {
+    return (
+      <p className="mt-4 rounded-xl border-2 border-border bg-card p-6 text-center text-muted-foreground">
+        Nenhum participante cadastrado.
+      </p>
+    );
+  }
+
+  return (
+    <div className="mt-4 space-y-3">
+      <p className="text-sm text-muted-foreground">
+        {submitted} de {rows.length} participante{rows.length === 1 ? "" : "s"} enviou palpites bônus.
+      </p>
+
+      <div className="space-y-3 sm:hidden">
+        {rows.map((row) => (
+          <BonusPredictionCard key={row.user_id} row={row} teamMap={teamMap} />
+        ))}
+      </div>
+
+      <div className="hidden overflow-x-auto rounded-xl border-2 border-border bg-card shadow sm:block">
+        <table className="w-full min-w-[56rem] text-sm">
+          <thead className="bg-primary text-primary-foreground">
+            <tr className="text-left">
+              <th className="sticky left-0 z-10 bg-primary p-3 min-w-[10rem]">Participante</th>
+              {BONUS_PREDICTION_COLUMNS.map((col) => (
+                <th key={col.key} className="p-3 whitespace-nowrap">
+                  {col.label}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row) => (
+              <tr key={row.user_id} className="border-t border-border">
+                <td className="sticky left-0 z-10 bg-card p-3">
+                  <ParticipantCell displayName={row.display_name} avatarUrl={row.avatar_url} />
+                </td>
+                {row.prediction ? (
+                  BONUS_PREDICTION_COLUMNS.map((col) => (
+                    <td key={col.key} className="max-w-[9rem] p-3">
+                      {col.type === "text" ? (
+                        <TextCell value={row.prediction![col.key] as string | null} />
+                      ) : (
+                        <TeamCell teamId={row.prediction![col.key] as string | null} teamMap={teamMap} />
+                      )}
+                    </td>
+                  ))
+                ) : (
+                  <td colSpan={BONUS_PREDICTION_COLUMNS.length} className="p-3 text-muted-foreground italic">
+                    Sem palpite
+                  </td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+function BonusPredictionCard({
+  row,
+  teamMap,
+}: {
+  row: BonusPredictionRow;
+  teamMap: Map<string, Team>;
+}) {
+  return (
+    <div className="rounded-xl border-2 border-border bg-card p-4 shadow-sm">
+      <ParticipantCell displayName={row.display_name} avatarUrl={row.avatar_url} className="mb-3" />
+      {!row.prediction ? (
+        <p className="text-sm text-muted-foreground italic">Sem palpite</p>
+      ) : (
+        <dl className="grid gap-2 text-sm">
+          {BONUS_PREDICTION_COLUMNS.map((col) => (
+            <div key={col.key} className="grid grid-cols-[minmax(0,7rem)_1fr] gap-2">
+              <dt className="text-muted-foreground">{col.label}</dt>
+              <dd className="min-w-0">
+                {col.type === "text" ? (
+                  <TextCell value={row.prediction![col.key] as string | null} />
+                ) : (
+                  <TeamCell teamId={row.prediction![col.key] as string | null} teamMap={teamMap} />
+                )}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      )}
+    </div>
+  );
+}
+
+function ParticipantCell({
+  displayName,
+  avatarUrl,
+  className,
+}: {
+  displayName: string;
+  avatarUrl: string | null;
+  className?: string;
+}) {
+  return (
+    <div className={cn("flex min-w-0 items-center gap-2", className)}>
+      <Avatar className="h-8 w-8 shrink-0">
+        <AvatarImage src={avatarUrl ?? undefined} alt={displayName} />
+        <AvatarFallback className="text-xs">{initials(displayName)}</AvatarFallback>
+      </Avatar>
+      <span className="truncate font-medium">{displayName}</span>
+    </div>
+  );
+}
+
+function TextCell({ value }: { value: string | null }) {
+  if (!value?.trim()) {
+    return <span className="text-muted-foreground italic">—</span>;
+  }
+  return <span className="truncate">{value}</span>;
+}
+
+function TeamCell({ teamId, teamMap }: { teamId: string | null; teamMap: Map<string, Team> }) {
+  if (!teamId) {
+    return <span className="text-muted-foreground italic">—</span>;
+  }
+  const team = teamMap.get(teamId);
+  if (!team) {
+    return <span className="text-muted-foreground italic">—</span>;
+  }
+  return (
+    <span className="inline-flex min-w-0 items-center gap-1.5">
+      <TeamFlag code={team.code} emoji={team.flag_emoji} size={16} className="shrink-0" />
+      <span className="truncate">{team.name}</span>
+    </span>
   );
 }
 

@@ -385,6 +385,24 @@ export type Database = {
           winner_only_count: number
         }[]
       }
+      get_admin_bonus_predictions: {
+        Args: never
+        Returns: {
+          avatar_url: string
+          best_attack_group_team_id: string
+          best_defense_group_team_id: string
+          champion_team_id: string
+          display_name: string
+          fourth_team_id: string
+          has_prediction: boolean
+          revelation_team_id: string
+          runner_up_team_id: string
+          third_team_id: string
+          top_assists: string
+          top_scorer: string
+          user_id: string
+        }[]
+      }
       get_started_match_predictions: {
         Args: { p_match_id: string }
         Returns: {
