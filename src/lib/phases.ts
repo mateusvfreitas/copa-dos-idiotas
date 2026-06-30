@@ -75,11 +75,11 @@ export function groupMatchesByDay(matches: Match[]) {
     .map(([dayKey, dayMatches]) => ({ dayKey, matches: dayMatches }));
 }
 
-export function getDefaultOpenDayKey(matches: Match[]) {
+export function getDefaultOpenDayKey(matches: Match[]): string | null {
   if (matches.length === 0) return null;
   const groups = groupMatchesByDay(matches);
   const today = getMatchDayKey(new Date().toISOString());
   if (groups.some((g) => g.dayKey === today)) return today;
   const future = groups.find((g) => g.dayKey > today);
-  return future?.dayKey ?? groups.at(-1)!.dayKey;
+  return future?.dayKey ?? null;
 }
